@@ -4,6 +4,8 @@ import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { generateToken, IUserToken } from "../utils/jwt";
+import { IReqUser } from "../middlewares/auth.middleware";
 
 type TRegister = {
   fullName: string;
@@ -20,6 +22,13 @@ type TLogin = {
 
 export default {
   async register(req: Request, res: Response) {
+    /**
+     #swagger.requestBody = {
+      required: true,
+      schema: {$ref: "#/components/schemas/RegisterRequest"}
+     } 
+     
+     */
     const { fullName, email, role, password, confirmedPassword } = req.body as unknown as TRegister;
 
     try {
@@ -46,7 +55,7 @@ export default {
         res.status(200).json({
           message: 'Registration success!',
           data: {
-            fullName, email
+            fullName, email, role
           }
         });
       } else {
@@ -65,6 +74,13 @@ export default {
     }
   },
   async login(req: Request, res: Response) {
+    /**
+     #swagger.requestBody = {
+      required: true,
+      schema: {$ref: "#/components/schemas/LoginRequest"}
+     } 
+     
+     */
     try {
       const { email, password } = req.body as unknown as TLogin;
 
@@ -82,21 +98,16 @@ export default {
           const isPasswordTrue = bcrypt.compareSync(password, user?.getDataValue('password'));
 
           if(isPasswordTrue) {
-            const payload = {
-              user_id: user?.getDataValue('id'),
+            const payload: IUserToken = {
+              id: user?.getDataValue('id'),
               email: user?.getDataValue('email'),
               role: user?.getDataValue('role'),
             }
 
-            const token = jwt.sign(payload, process.env.JWT_TOKEN as string, { expiresIn: "1day" });
+            const token = generateToken(payload);
             res.json({ 
               message: 'Login success!',
-              token, 
-              data: {
-                fullName: user.getDataValue('fullName'), 
-                email: user.getDataValue('email'), 
-                role: user.getDataValue('role'),
-              } 
+              token
             });
           }
         } else {
@@ -114,6 +125,28 @@ export default {
       const err = error as unknown as Error;
       res.status(400).json({
         message: err.message,
+        data: null,
+      });
+    }
+  },
+  cobain(req: IReqUser, res: Response) {
+    /**
+     #swagger.security = [{
+      bearerAuth: []
+     }] 
+     */
+    try {
+      const user = req.user;
+      const result = User.findOne({ where: { id: user?.id } });
+
+      res.status(200).json({
+        message: 'Success, User found!!!',
+        data: result
+      })
+    } catch(err) {
+      const error = err as unknown as Error;
+      res.status(400).json({
+        message: error.message,
         data: null,
       });
     }
