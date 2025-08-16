@@ -1,7 +1,10 @@
 import { Sequelize, DataTypes } from "sequelize";
 import sequelize from "../utils/db";
+import Admin from "./admin.model";
+import Agronomist from "./agronomist.model";
+import Farmer from "./farmer.model";
 
-const User = sequelize.define('User', {
+const User = sequelize.define('user', {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,

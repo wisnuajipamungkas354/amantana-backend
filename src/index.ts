@@ -9,7 +9,12 @@ async function init() {
   try {
     const app = expresss();
     const PORT = 3000;
-    await sequelize.sync();
+    await sequelize.sync({ force: true }).then(() => {
+      console.log('Database connected!');
+    })
+    .catch(err => {
+      console.error('Error syncing database:', err);
+    });;
 
     app.use(cors());
     app.use(bodyParser.json());

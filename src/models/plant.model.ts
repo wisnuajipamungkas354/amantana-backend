@@ -1,24 +1,26 @@
 import { Sequelize, DataTypes } from "sequelize";
 import sequelize from "../utils/db";
 
-const Plant = sequelize.define('Plant', {
+const Plant = sequelize.define('plant', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  nama: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  spesies: {
+  species: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  lokasi: {
-    type: DataTypes.STRING,
-    allowNull: false
+  latitude: {
+    type: DataTypes.FLOAT,
+  },
+  longitude: {
+    type: DataTypes.FLOAT,
   }
 });
 
-// Plant.associations({ 'user_id' });
+export default Plant;

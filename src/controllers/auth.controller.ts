@@ -129,26 +129,4 @@ export default {
       });
     }
   },
-  cobain(req: IReqUser, res: Response) {
-    /**
-     #swagger.security = [{
-      bearerAuth: []
-     }] 
-     */
-    try {
-      const user = req.user;
-      const result = User.findOne({ where: { id: user?.id } });
-
-      res.status(200).json({
-        message: 'Success, User found!!!',
-        data: result
-      })
-    } catch(err) {
-      const error = err as unknown as Error;
-      res.status(400).json({
-        message: error.message,
-        data: null,
-      });
-    }
-  }
 }
